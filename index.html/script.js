@@ -9,7 +9,7 @@ const firebaseConfig = {
     measurementId: "G-CRLBR3R1X8"
 };
 
-const USE_FIREBASE = false; // ВКЛЮЧИТЬ ОНЛАЙН РЕЖИМ
+const USE_FIREBASE = true; // ВКЛЮЧИТЬ ОНЛАЙН РЕЖИМ
 
 console.log('=== ГРИБ КАЗИНО v4.0 ===');
 console.log('🌐 Онлайн режим: ВКЛЮЧЕН');
@@ -29,33 +29,34 @@ class FirebaseManager {
     }
     
     async initFirebase() {
-        try {
-            console.log('🔥 Инициализация Firebase...');
-            
-            // Проверяем загрузку Firebase
-            if (typeof firebase === 'undefined') {
-                console.error('❌ Firebase SDK не загружен. Проверьте HTML.');
-                return;
-            }
-            
-            // Инициализация Firebase
-            firebase.initializeApp(firebaseConfig);
-            this.db = firebase.firestore();
-            
-          
-            // Создаем ссылки на коллекции
-            this.usersRef = this.db.collection('users');
-            this.onlineRef = this.db.collection('online');
-            
-            this.isConnected = true;
-            console.log('✅ Firebase успешно подключен');
-            
-        } catch (error) {
-            console.error('❌ Критическая ошибка Firebase:', error);
-            console.error('🔧 Детали:', error.message);
-            this.isConnected = false;
+    try {
+        console.log('🔥 Инициализация Firebase...');
+        
+        // Проверяем загрузку Firebase
+        if (typeof firebase === 'undefined') {
+            console.error('❌ Firebase SDK не загружен. Проверьте HTML.');
+            return;
         }
+        
+        // Инициализация Firebase БЕЗ дополнительных настроек
+        firebase.initializeApp(firebaseConfig);
+        this.db = firebase.firestore();
+        
+        // УБЕРИТЕ ВСЕ НАСТРОЙКИ settings() - они не нужны!
+        // Не добавляйте this.db.settings() вообще
+        
+        // Создаем ссылки на коллекции
+        this.usersRef = this.db.collection('users');
+        this.onlineRef = this.db.collection('online');
+        
+        this.isConnected = true;
+        console.log('✅ Firebase успешно подключен');
+        
+    } catch (error) {
+        console.error('❌ Ошибка Firebase:', error.message);
+        this.isConnected = false;
     }
+}
     
     // ========== СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ ==========
     async saveUser(user) {
