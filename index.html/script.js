@@ -9,12 +9,12 @@ const firebaseConfig = {
     measurementId: "G-CRLBR3R1X8"
 };
 
-const USE_FIREBASE = true; // ВКЛЮЧИТЬ ОНЛАЙН РЕЖИМ
+const USE_FIREBASE = false; // ВКЛЮЧИТЬ ОНЛАЙН РЕЖИМ
 
 console.log('=== ГРИБ КАЗИНО v4.0 ===');
 console.log('🌐 Онлайн режим: ВКЛЮЧЕН');
 
-// ======================= FIREBASE МЕНЕДЖЕР =======================
+// ======================= ИСПРАВЛЕННЫЙ FIREBASE МЕНЕДЖЕР =======================
 class FirebaseManager {
     constructor() {
         this.db = null;
@@ -32,41 +32,27 @@ class FirebaseManager {
         try {
             console.log('🔥 Инициализация Firebase...');
             
-            // Проверяем, загружена ли Firebase
+            // Проверяем загрузку Firebase
             if (typeof firebase === 'undefined') {
-                console.error('❌ Firebase не загружен. Добавьте скрипт в HTML.');
+                console.error('❌ Firebase SDK не загружен. Проверьте HTML.');
                 return;
             }
             
-            // Инициализируем Firebase
+            // Инициализация Firebase
             firebase.initializeApp(firebaseConfig);
             this.db = firebase.firestore();
             
-            // Настройки для лучшей работы
-            this.db.settings({
-                experimentalForceLongPolling: true,
-                merge: true
-            });
-            
-            // Ссылки на коллекции
+          
+            // Создаем ссылки на коллекции
             this.usersRef = this.db.collection('users');
             this.onlineRef = this.db.collection('online');
             
-            // Включаем кэширование
-            this.db.enablePersistence()
-                .then(() => {
-                    console.log('✅ Firebase готов к работе');
-                    this.isConnected = true;
-                })
-                .catch(err => {
-                    console.log('⚠️ Работаем без кэширования:', err);
-                    this.isConnected = true;
-                });
-                
-            console.log('✅ Firebase подключен');
+            this.isConnected = true;
+            console.log('✅ Firebase успешно подключен');
             
         } catch (error) {
-            console.error('❌ Ошибка Firebase:', error);
+            console.error('❌ Критическая ошибка Firebase:', error);
+            console.error('🔧 Детали:', error.message);
             this.isConnected = false;
         }
     }
@@ -207,7 +193,7 @@ class FirebaseManager {
         }
     }
     
-    // ========== ПОДПИСКА НА ОНЛАЙН ПОЛЬЗОВАТЕЛЕЙ (РЕАЛЬНОЕ ВРЕМЯ) ==========
+    // ========== ПОДПИСКА НА ОНЛАЙН ПОЛЬЗОВАТЕЛЕЙ ==========
     subscribeToOnlineUsers(callback) {
         if (!this.isConnected || !this.onlineRef) {
             console.log('⚠️ Онлайн обновления отключены');
@@ -254,7 +240,7 @@ class FirebaseManager {
         }
     }
     
-    // ========== ЛОКАЛЬНЫЕ ФУНКЦИИ (ЗАПАС) ==========
+    // ========== ЛОКАЛЬНЫЕ ФУНКЦИИ ==========
     saveUserLocal(user) {
         const users = JSON.parse(localStorage.getItem('casinoUsers') || '{}');
         users[user.username] = user;
@@ -284,6 +270,9 @@ class FirebaseManager {
         this.unsubscribers = [];
     }
 }
+
+// ... остальной код класса CasinoSystem БЕЗ ИЗМЕНЕНИЙ ...
+// (используйте ваш предыдущий код класса CasinoSystem)
 
 // ======================= ОБНОВЛЕННЫЙ КЛАСС КАЗИНО =======================
 class CasinoSystem {
